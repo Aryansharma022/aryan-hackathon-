@@ -15,7 +15,14 @@ from pydantic import BaseModel, Field
 
 load_dotenv()
 app = FastAPI(title="Adaptive Assessment Engine API", version="1.0.0")
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://localhost:5174"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+frontend_origins = os.getenv("FRONTEND_ORIGINS") or os.getenv("FRONTEND_ORIGIN") or "http://localhost:5173,http://localhost:5174"
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[origin.strip().rstrip("/") for origin in frontend_origins.split(",") if origin.strip()],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 client = None
 db = None
